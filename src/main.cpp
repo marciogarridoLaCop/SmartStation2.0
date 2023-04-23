@@ -9,9 +9,10 @@
 #include <biblioteca_display.h>
 #include <biblioteca_eeprom.h>
 #include <parametros.h>
+#include <testwf1.h>
 
 //-----------------------------------------------------------------------------------------------------
-#include <WiFi.h>
+
 #include <AsyncTCP.h>
 #include <Wire.h> //biblioteca para a configuração dos pinos SDA e SCL do sensor
 #include <SPI.h>
@@ -44,7 +45,6 @@ void ProcessaCadaSegundo();
 void ProcessaCadaMinuto();
 void ProcessaCadaHora();
 void ProcessaCadaDia();
-void Wtempo();
 void RTCset();
 void windvelocity();
 void TestCh();
@@ -54,7 +54,7 @@ float DirWind();
 void MedLuz();
 void logSDCard();
 void TestWf();
-void TestWf1();
+
 
 //---------Plataformas---------
 // retiradas
@@ -463,15 +463,10 @@ void Pluv()
 // Write the sensor readings on the SD card
 void logSDCard()
 {
-
   tempo();
-
   String dataString2 = "";
-
   dataString2 = dataString2 + ";" + rain + ";" + rainh + ";" + t + ";" + h + ";" + Pr + ";" + vmd + ";" + vmax + ";" + winddir_eu + ";" + UVmax + ";" + solar + ";" + "\r\n";
-
   dataMessage = DataAtual + dataString2;
-
   Serial.println(F(""));
   Serial.print(F("Save data : "));
   Serial.println(dataMessage);
@@ -546,35 +541,8 @@ void TestWf()
   esp_task_wdt_reset();
 } // end send
 
-//--------------------------------------------------------------
-void TestWf1()
-{
-
-  if (WiFi.status() == WL_CONNECTED)
-  {
-    Serial.println(F(" --- Conectado ao roteador --- "));
-  }
-  else
-  {
-    Serial.println(F(" --- Nao conectado ao roteador !!!"));
-    // connectWifi();
-  }
-}
-
-//---------------------------------------------------------------------------------------------
-
-
-//----------------------------------------------------------------
-
-
-//------------------------------------------------------------------------
-
-
-//-------------------------------------------------------------------
-
 void RTCset()
 {
-
   rtc.adjust(DateTime(Wano, Wmes, Wdia, Whr, Wmn, Wsg));
 }
 //-----------------------------------------------------------------------------------------------------
@@ -695,7 +663,6 @@ void LeTempUmiPress()
   t = dht.readTemperature();
   p = bmp.readPressure();
   ti = bmp.readTemperature();
-
   if ((t >= 60) || (t <= -10) || (p < 30000) || (isnan(h)) || (isnan(t)))
   {
     Serial.println(" ATENCAO : Erro no DHT22 . . . . . . ");
@@ -730,17 +697,14 @@ void MedLuz()
   Serial.print(" Radiacao Solar : ");
   Serial.print(solar);
   Serial.println("  W/mm2");
-
   // UV
   Serial.print("Vis: ");
   Serial.println(uv.readVisible());
   Serial.print("IR: ");
   Serial.println(uv.readIR());
-
   UVmax = uv.readUV();
   UVmax /= 100.0;
   UVmax = 0; // ATENÇÃO . . . . . .
-
   Serial.print("UV: ");
   Serial.println(UVmax);
 }
@@ -774,7 +738,6 @@ void connectWifi()
 //-----------Testa botao reset wf ---------
 void TestCh()
 {
-
   int vlr = digitalRead(PIN_VLR);
   // HIGH
   if (vlr != LOW)
@@ -788,12 +751,9 @@ void TestCh()
   WiFiManager wifiManager;
   wifiManager.resetSettings();
   ESP.restart();
-
   // End TestCh
 }
-
 //------------------------------------------------------------
-
 float DirWind()
 {
   for (int i = 0; i < 20; i++)
@@ -803,9 +763,7 @@ float DirWind()
     wds = wds + wd;
     delay(50);
   }
-
   winddirstate = wds / 20;
-
   if ((winddirstate >= 3150) && (winddirstate <= 5000))
   {
     winddir_eu = 0;
@@ -841,18 +799,15 @@ float DirWind()
 
   wd = 0;
   wds = 0;
-
   Serial.print(" -- Pin Status: ");
   Serial.println(winddirstate);
   //}
   return winddir_eu;
 }
-
 // Measure wind speed  -------------------------------------------------
 void windvelocity()
 {
   NL++;
-
   lastMillis = xTaskGetTickCount();
   while (xTaskGetTickCount() - lastMillis < 3000)
   {
